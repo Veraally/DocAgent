@@ -489,3 +489,59 @@
 - The input is a `<textarea>` (not `<input>`) to allow multi-line questions.
 - Phase 4 (Frontend) is complete. Ready for Task 15 (Testing &
   Documentation).
+
+---
+
+## Task 15 - Testing & Documentation
+
+**Status:** ✅ Completed
+
+**Date:** 2026-07-13
+
+### Completed
+
+- **Codebase review**: reviewed all 17 source files (backend Python + frontend
+  Vue/JS/CSS) for consistency, dead code, and lint-level issues.
+  - Removed unused `store` variable from `_build_rag_chain()` return in
+    `chat.py` — it was unpacked but never referenced in the `chat()` function.
+  - Verified `.env` is properly gitignored (only `.env.example` tracked).
+  - All imports are used; no dead imports found.
+  - All Pydantic models have complete docstrings.
+  - Vue components use consistent Composition API patterns.
+  - CSS variables used consistently throughout.
+- **README.md** rewritten with:
+  - Tech stack table, prerequisites, quick start instructions.
+  - API endpoint reference table.
+  - Project structure diagram.
+  - Links to all docs.
+- **End-to-end verification** — complete workflow tested:
+  1. Upload PDF A (3-page, 1 empty) → 2 chunks indexed, page numbers preserved (1, 3).
+  2. Chat about Spring DI → correct answer with `【第1页】【第3页】` citation markers.
+  3. Source verification → all sources include `filename`, `page`, `content`.
+  4. Reset → knowledge base cleared, chat returns 503.
+  5. Double reset → idempotent ("Nothing to reset" on second call).
+  6. Re-upload PDF B (REST API) → fresh index, old content fully replaced.
+  7. Chat about REST → answer correctly addresses HTTP methods, no Spring content.
+  8. Empty question → 400.
+  9. No KB → 503.
+- **Build verification**:
+  - Backend: `uv run python -c "from main import app"` — imports OK.
+  - Frontend: `npm run build` — 30 modules, 0 errors.
+
+### Notes
+
+- All 15 tasks across 5 phases are complete. The MVP is ready for demonstration.
+- The codebase is clean, consistent, and follows the spec.
+
+### Final Project Summary
+
+```
+Phase 1 - Init:        Tasks 1-3  (backend, frontend, AI env)
+Phase 2 - Knowledge:   Tasks 4-8  (upload, parse, chunk, embed, index)
+Phase 3 - RAG:         Tasks 9-11 (retrieval, prompt, chat API)
+Phase 4 - Frontend:    Tasks 12-14 (citation, upload page, chat page)
+Phase 5 - Finalize:    Task 15    (polish, README, E2E verification)
+
+API: POST /api/upload | POST /api/chat | POST /api/reset | GET /health
+Pages: Home (upload + reset) | Chat (Q&A + citations)
+```

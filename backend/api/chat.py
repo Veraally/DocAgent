@@ -29,13 +29,13 @@ class ChatResponse(BaseModel):
     sources: list[Source]
 
 
-def _build_rag_chain() -> tuple[VectorStore, RetrievalService, PromptBuilder]:
+def _build_rag_chain() -> tuple[RetrievalService, PromptBuilder]:
     """Load the vector store and wire up retrieval + prompt services."""
     store = VectorStore.load(VECTOR_STORE_DIR)
     embedder = EmbeddingService()
     retriever = RetrievalService(embedder, store)
     prompt_builder = PromptBuilder()
-    return store, retriever, prompt_builder
+    return retriever, prompt_builder
 
 
 @router.post("/api/chat", response_model=ChatResponse)
@@ -53,7 +53,7 @@ def chat(request: ChatRequest) -> ChatResponse:
 
     # Load index (fail early if no knowledge base exists)
     try:
-        store, retriever, prompt_builder = _build_rag_chain()
+        retriever, prompt_builder = _build_rag_chain()
     except FileNotFoundError:
         raise HTTPException(
             status_code=503,
