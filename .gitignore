@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Environment
+.env
+
+# Node
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads
+backend/data/uploads/
+
+# Vector Store
+backend/data/vector_store/
+
+# Model Cache (optional)
+models/
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# Claude Code
+.claude/
