@@ -67,3 +67,35 @@
 
 - Embedding model (`BAAI/bge-small-zh-v1.5`) will be auto-downloaded by `sentence-transformers` on first use.
 - Backend is ready for Phase 2 (Knowledge Base) implementation.
+
+---
+
+## Task 4 - PDF Upload
+
+**Status:** ✅ Completed
+
+**Date:** 2026-07-13
+
+### Completed
+
+- Created `POST /api/upload` endpoint in `backend/api/upload.py`.
+- Implemented three-layer PDF validation:
+  1. MIME type check (`application/pdf`).
+  2. File size limit (50 MB).
+  3. Magic bytes check (`%PDF` header).
+- Saved uploaded files to `backend/data/uploads/` with unique names (`{uuid}_{original_stem}.pdf`).
+- Created `backend/utils/response.py` — unified `success_response` / `error_response` helpers.
+- Added `DATA_DIR` to `backend/core/config.py` for centralized path management.
+- Registered upload router in `backend/main.py`.
+
+### Verified
+
+- Valid PDF with correct MIME → accepted and saved.
+- Non-PDF file → rejected (MIME type).
+- Non-PDF content with PDF MIME → rejected (magic bytes).
+- Uploaded file content matches original.
+
+### Notes
+
+- PyMuPDF will be added in Task 5 for actual PDF text extraction.
+- File size limit is 50 MB (adjustable in the code).

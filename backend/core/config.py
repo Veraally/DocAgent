@@ -21,3 +21,6 @@ EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "BAAI/bge-small-zh-v1.5")
 CHUNK_SIZE: int = int(os.getenv("CHUNK_SIZE", "500"))
 CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP", "100"))
 TOP_K: int = int(os.getenv("TOP_K", "5"))
+
+# --- Paths ---
+DATA_DIR: Path = _project_root / "backend" / "data"
