@@ -390,3 +390,50 @@
 - Metadata format change (list → dict) is backward compatible with pre-Task
   12 indexes.
 - Phase 4 (Frontend) is next: Task 13 (Upload Page) and Task 14 (Chat Page).
+
+---
+
+## Task 13 - Upload Page
+
+**Status:** ✅ Completed
+
+**Date:** 2026-07-13
+
+### Completed
+
+- Rewrote `HomePage.vue` with a full upload workflow using Vue 3 Composition API
+  (`<script setup>`):
+  - **Drag-and-drop zone** with click-to-browse fallback. Accepts PDF files only.
+  - **File validation**: checks file type (PDF) and size (50 MB limit) on the
+    client side before upload.
+  - **Upload progress**: spinner + "Uploading & indexing..." message with the
+    file name while the backend processes the PDF.
+  - **Knowledge Base status**: after upload, displays the indexed filename and
+    chunk count with a direct link to the Chat page.
+  - **Reset**: confirmation-prompted button that calls `POST /api/reset` and
+    clears the local state.
+  - **Error handling**: inline error banner for upload failures; alert for
+    reset failures.
+  - **Passive KB detection**: on mount, probes `/api/chat` to infer whether a
+    knowledge base exists and surfaces its status.
+- Added ~170 lines of CSS to `style.css` for the upload page:
+  - `.card`, `.btn` (primary, danger variants), `.spinner`, `.drop-zone`,
+    `.kb-status`, `.error-banner`, `.success-banner`.
+  - Uses existing CSS variables for consistent Linear-inspired theming.
+  - Responsive layout breakpoints at 600px.
+
+### Verified
+
+- Frontend `npm run build` succeeds (30 modules, 0 errors).
+- Full API workflow end-to-end: upload → chat (with citations) → reset → 503
+  after reset.
+- API surface unchanged from Task 12.
+
+### Notes
+
+- KB status detection uses a lightweight probe (short question via
+  `/api/chat`). A dedicated `GET /api/status` could be cleaner but isn't
+  necessary for MVP.
+- The upload page handles all three Task 13 requirements: upload PDF, show
+  upload status, reset knowledge base.
+- Ready for Task 14 (Chat Page).
