@@ -99,3 +99,37 @@
 
 - PyMuPDF will be added in Task 5 for actual PDF text extraction.
 - File size limit is 50 MB (adjustable in the code).
+
+---
+
+## Task 5 - PDF Parsing
+
+**Status:** ✅ Completed
+
+**Date:** 2026-07-13
+
+### Completed
+
+- Installed `pymupdf` (fitz) as a backend dependency.
+- Created `backend/models/document.py` — Pydantic models:
+  - `DocumentPage`: page number, text content, character count.
+  - `ParsedDocument`: filename, total non-empty pages, list of pages, total character count.
+- Created `backend/services/parser.py` — `PDFParser` class:
+  - `parse(file_path: Path) -> ParsedDocument`
+  - Extracts text page by page via PyMuPDF.
+  - Skips empty/stripped pages automatically.
+  - Preserves original 1-based page numbers for citation support.
+  - Raises `FileNotFoundError` for missing files; PyMuPDF raises `FileDataError` for non-PDF files.
+
+### Verified
+
+- 4-page PDF with 2 empty pages → correctly reports 2 non-empty pages.
+- Page numbers preserved (1 and 3, not re-indexed).
+- Per-page and total character counts accurate.
+- Missing files and non-PDF files raise appropriate errors.
+
+### Notes
+
+- Parser is fully independent of chunking (Task 6) and embedding (Task 7).
+- Page numbers stored for future citation support (Task 12).
+- Structured output is ready for the next task.
