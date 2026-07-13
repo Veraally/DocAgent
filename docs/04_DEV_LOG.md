@@ -298,3 +298,45 @@
 
 - Template is stored as a file, not hardcoded — easy to iterate on prompt engineering.
 - Ready for Chat API (Task 11).
+
+---
+
+## Task 11 - Chat API
+
+**Status:** ✅ Completed
+
+**Date:** 2026-07-13
+
+### Completed
+
+- Created `backend/services/llm.py` — `LLMService` class:
+  - Calls Ollama `/api/generate` via HTTP (`requests`).
+  - Configurable `base_url` and `model` (defaults from config).
+  - Returns raw generated text.
+- Created `backend/services/pipeline.py` — `ProcessingPipeline` class:
+  - Orchestrates the full parse → chunk → embed → index → save flow.
+  - `process(file_path) → int` returns chunk count.
+  - Reused by the upload endpoint.
+- Created `backend/api/chat.py` — `POST /api/chat` endpoint:
+  - Request: `{"question": "..."}`.
+  - Response: `{"answer": "...", "sources": [{"page": 1, "content": "..."}]}`.
+  - Loads vector store from disk; returns 503 if no knowledge base exists.
+  - Returns 400 for empty questions.
+  - Returns 502 if LLM generation fails.
+- Updated `backend/api/upload.py` — runs `ProcessingPipeline` after saving the PDF.
+- Updated `backend/main.py` — registered chat router.
+- Added `VECTOR_STORE_DIR` to `backend/core/config.py`.
+
+### Verified (end-to-end)
+
+- Upload PDF → index built automatically (1 chunk).
+- Question "什么是Spring IoC？" → LLM answers correctly with "根据文档第一页" citation.
+- Upload new PDF → index rebuilt, old content replaced.
+- Question about new content "什么是反向传播？" → LLM answers about backpropagation citing page 1.
+- Empty question → 400 with unified error.
+- No knowledge base → 503 with clear message.
+
+### Notes
+
+- The complete RAG pipeline is now wired as a single API flow.
+- Phase 3 (RAG) is complete. Ready for citation display (Task 12).

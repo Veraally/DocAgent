@@ -24,3 +24,4 @@ TOP_K: int = int(os.getenv("TOP_K", "5"))
 
 # --- Paths ---
 DATA_DIR: Path = _project_root / "backend" / "data"
+VECTOR_STORE_DIR: Path = DATA_DIR / "vector_store"

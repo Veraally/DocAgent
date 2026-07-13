@@ -77,10 +77,17 @@ async def upload_pdf(file: UploadFile = File(...)) -> dict:
     content = await file.read()
     file_path.write_bytes(content)
 
+    # Process the PDF through the full knowledge-base pipeline
+    from services.pipeline import ProcessingPipeline
+
+    pipeline = ProcessingPipeline()
+    chunk_count = pipeline.process(file_path)
+
     return success_response(
         message="Upload successful",
         data={
             "filename": unique_name,
             "original_name": file.filename,
+            "chunks_indexed": chunk_count,
         },
     )
