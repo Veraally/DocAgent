@@ -26,22 +26,33 @@ class VectorStore:
         self.dim = dim
         self.index: faiss.Index | None = None
         self._metadata: list[dict] = []
+        self._filename: str = ""
+
+    @property
+    def filename(self) -> str:
+        """The original PDF filename this index was built from."""
+        return self._filename
 
     # ------------------------------------------------------------------
     # Build
     # ------------------------------------------------------------------
 
-    def build(self, embeddings: list[ChunkEmbedding]) -> None:
+    def build(self, embeddings: list[ChunkEmbedding], filename: str = "") -> None:
         """Build a FAISS index from *embeddings*.
 
         Uses ``IndexFlatIP`` (inner product) because embeddings are
         L2-normalised, making inner product equivalent to cosine similarity.
+
+        Args:
+            embeddings: Chunks with their embedding vectors.
+            filename: The original PDF filename (stored for citations).
         """
         vectors = np.array(
             [e.embedding for e in embeddings], dtype=np.float32
         )
         self.index = faiss.IndexFlatIP(self.dim)
         self.index.add(vectors)
+        self._filename = filename
 
         self._metadata = [
             {
@@ -89,6 +100,7 @@ class VectorStore:
                     page_number=meta["page_number"],
                     text=meta["text"],
                     score=float(score),
+                    filename=self._filename,
                 )
             )
         return results
@@ -114,7 +126,12 @@ class VectorStore:
         faiss.write_index(self.index, str(index_path))
 
         with open(meta_path, "w", encoding="utf-8") as f:
-            json.dump(self._metadata, f, ensure_ascii=False, indent=2)
+            json.dump(
+                {"filename": self._filename, "chunks": self._metadata},
+                f,
+                ensure_ascii=False,
+                indent=2,
+            )
 
     @classmethod
     def load(cls, directory: Path, dim: int = 512) -> "VectorStore":
@@ -142,7 +159,15 @@ class VectorStore:
         store.index = faiss.read_index(str(index_path))
 
         with open(meta_path, "r", encoding="utf-8") as f:
-            store._metadata = json.load(f)
+            raw = json.load(f)
+
+        if isinstance(raw, list):
+            # Legacy format (pre-Task 12): flat list of chunk dicts
+            store._metadata = raw
+            store._filename = ""
+        else:
+            store._metadata = raw.get("chunks", [])
+            store._filename = raw.get("filename", "")
 
         return store
 

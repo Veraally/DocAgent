@@ -340,3 +340,53 @@
 
 - The complete RAG pipeline is now wired as a single API flow.
 - Phase 3 (RAG) is complete. Ready for citation display (Task 12).
+
+---
+
+## Task 12 - Citation Support
+
+**Status:** ✅ Completed
+
+**Date:** 2026-07-13
+
+### Completed
+
+- Added `filename` field to `SearchResult` model — carries the original PDF name
+  through the search pipeline.
+- Updated `VectorStore`:
+  - `build()` now accepts a `filename` argument stored alongside chunk metadata.
+  - `save()` persists filename in `metadata.json` as a structured dict
+    (`{"filename": "...", "chunks": [...]}`).
+  - `load()` supports both the new format and legacy flat-list format
+    (backward compatible).
+  - `search()` populates `filename` in every `SearchResult`.
+- Updated `ProcessingPipeline.process()` to pass the PDF filename to
+  `VectorStore.build()`.
+- Updated `Source` model in `chat.py` to include `filename` alongside `page`
+  and `content`.
+- Created `POST /api/reset` endpoint in `backend/api/reset.py`:
+  - Deletes the vector store directory (index + metadata).
+  - Clears uploaded PDFs.
+  - Returns 200 with success message; idempotent ("Nothing to reset" if
+    already empty).
+- Registered reset router in `backend/main.py`.
+- Improved prompt template — LLM now cites `【第N页】` inline in answers for
+  structured, verifiable citations.
+
+### Verified
+
+- Chat API `sources[]` now includes `filename`, `page`, and `content` for
+  every retrieved chunk.
+- LLM answer text includes `【第N页】` citation markers.
+- Reset clears the knowledge base; subsequent chat returns 503.
+- Double reset is idempotent.
+- Re-upload after reset works correctly (full pipeline executes).
+
+### Notes
+
+- The `filename` stored is the unique server-side name (e.g.
+  `{uuid8}_{stem}.pdf`), not the user's original filename. This is
+  intentional — the original name is already returned by the upload endpoint.
+- Metadata format change (list → dict) is backward compatible with pre-Task
+  12 indexes.
+- Phase 4 (Frontend) is next: Task 13 (Upload Page) and Task 14 (Chat Page).

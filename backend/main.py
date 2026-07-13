@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.chat import router as chat_router
+from api.reset import router as reset_router
 from api.upload import router as upload_router
 
 app = FastAPI(
@@ -22,6 +23,7 @@ app.add_middleware(
 
 app.include_router(upload_router)
 app.include_router(chat_router)
+app.include_router(reset_router)
 
 
 @app.get("/health")

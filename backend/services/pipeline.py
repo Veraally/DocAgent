@@ -35,7 +35,7 @@ class ProcessingPipeline:
         chunks = self._chunker.chunk(parsed)
         embeddings = self._embedder.embed_chunks(chunks)
 
-        self._store.build(embeddings)
+        self._store.build(embeddings, filename=file_path.name)
         self._store.save(VECTOR_STORE_DIR)
 
         return len(chunks)

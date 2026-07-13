@@ -15,3 +15,4 @@ class SearchResult(BaseModel):
     page_number: int
     text: str
     score: float
+    filename: str = ""

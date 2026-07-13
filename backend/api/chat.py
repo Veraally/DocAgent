@@ -19,6 +19,7 @@ class ChatRequest(BaseModel):
 
 
 class Source(BaseModel):
+    filename: str
     page: int
     content: str
 
@@ -81,7 +82,8 @@ def chat(request: ChatRequest) -> ChatResponse:
         )
 
     sources = [
-        Source(page=r.page_number, content=r.text) for r in results
+        Source(filename=r.filename, page=r.page_number, content=r.text)
+        for r in results
     ]
 
     return ChatResponse(answer=answer, sources=sources)
