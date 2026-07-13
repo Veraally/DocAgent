@@ -133,3 +133,39 @@
 - Parser is fully independent of chunking (Task 6) and embedding (Task 7).
 - Page numbers stored for future citation support (Task 12).
 - Structured output is ready for the next task.
+
+---
+
+## Task 6 - Text Chunking
+
+**Status:** ✅ Completed
+
+**Date:** 2026-07-13
+
+### Completed
+
+- Installed `langchain` and `langchain-text-splitters` as backend dependencies.
+- Created `backend/models/chunk.py` — `TextChunk` model:
+  - `chunk_index`: sequential index across the entire document.
+  - `page_number`: source page for citation support.
+  - `text`: chunk content.
+  - `char_count`: character count.
+- Created `backend/services/chunker.py` — `DocumentChunker` class:
+  - Uses LangChain's `RecursiveCharacterTextSplitter` with separators tuned for Chinese text (`\n\n`, `\n`, `。`, `. `, ` `).
+  - Chunks each page independently — no cross-page chunks.
+  - Reads `CHUNK_SIZE` (500) and `CHUNK_OVERLAP` (100) from config.
+  - Returns a flat `list[TextChunk]` with sequential indices.
+
+### Verified
+
+- 2-page Chinese PDF → 4 chunks, all correctly attributed to their source page.
+- No chunks exceed the configured size limit.
+- `chunk_index` is sequential (0, 1, 2, 3).
+- Single-page short text → 1 chunk with correct metadata.
+- Default config values (500/100) used automatically via `core.config`.
+
+### Notes
+
+- Chunker is independent of parsing (Task 5) and embedding (Task 7).
+- Chinese-aware separators ensure clean breaks at sentence/paragraph boundaries.
+- Flat chunk list with page numbers is ready for embedding generation.
