@@ -201,3 +201,38 @@
 - The model is downloaded from HuggingFace on first use and cached locally.
 - Embeddings are normalised so FAISS `IndexFlatIP` (inner product) can be used for cosine similarity.
 - Ready for FAISS indexing (Task 8).
+
+---
+
+## Task 8 - Build FAISS Index
+
+**Status:** ✅ Completed
+
+**Date:** 2026-07-13
+
+### Completed
+
+- Installed `faiss-cpu` as a backend dependency.
+- Created `backend/models/search.py` — `SearchResult` model:
+  - `chunk_index`, `page_number`, `text`, `score` (cosine similarity via inner product).
+- Created `backend/services/vector_store.py` — `VectorStore` class:
+  - `build(embeddings)` — creates `IndexFlatIP`, adds normalised vectors.
+  - `search(query_embedding, top_k)` — returns top-K `SearchResult` objects sorted by score.
+  - `save(directory)` — persists `index.faiss` + `metadata.json` to disk.
+  - `load(directory)` — restores index and metadata from disk.
+  - `__len__` — returns vector count.
+  - Raises `RuntimeError` if searched before `build()`.
+
+### Verified
+
+- Three semantically distinct pages (deep learning, Python, databases).
+- Three queries each hit the correct page at rank 1.
+- Persist → reload produces identical search results.
+- Empty store raises `RuntimeError` on search.
+- Missing files raise `FileNotFoundError` on load.
+
+### Notes
+
+- Uses `IndexFlatIP` (exact search, no approximation) — ideal for MVP with small document collections.
+- Vector store directory (`backend/data/vector_store/`) is gitignored (runtime data).
+- Ready for retrieval pipeline (Task 9).
