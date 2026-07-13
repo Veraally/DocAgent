@@ -437,3 +437,55 @@
 - The upload page handles all three Task 13 requirements: upload PDF, show
   upload status, reset knowledge base.
 - Ready for Task 14 (Chat Page).
+
+---
+
+## Task 14 - Chat Page
+
+**Status:** ✅ Completed
+
+**Date:** 2026-07-13
+
+### Completed
+
+- Rewrote `ChatPage.vue` with a complete Q&A interface using Vue 3 Composition
+  API (`<script setup>`):
+  - **Question input**: `<textarea>` at the bottom of the page, submits on
+    Enter or click. Disabled during loading.
+  - **Answer display**: full answer text rendered with highlighted `【第N页】`
+    citation markers (styled as inline purple badges).
+  - **Citation display**: source cards below the answer, each showing the
+    filename, page number badge, and the full chunk content.
+  - **Loading state**: centered spinner with "Searching documents & generating
+    answer..." text while waiting for the LLM.
+  - **Error state**: inline red banner with dismiss button.
+  - **No-KB state**: amber warning banner with link to the Home upload page.
+  - **Empty state**: icon + prompt text before the first question is asked.
+  - **KB status bar**: shows the currently indexed filename as a small badge
+    (probed on mount via the chat API).
+  - **Auto-scroll**: after an answer arrives, smooth-scrolls to the bottom.
+- Added ~180 lines of CSS to `style.css` for the chat page:
+  - `.chat-page`, `.chat-header`, `.answer-area`, `.answer-card`, `.answer-text`
+  - `.citation-mark` — inline highlighted badge
+  - `.sources-section`, `.source-card`, `.source-header`, `.source-page` badge
+  - `.chat-input-area` (sticky bottom), `.chat-input`, `.chat-submit`
+  - `.warning-banner`, `.kb-status-bar`, `.chat-empty`, `.loading-area`
+  - All using existing CSS variables for consistent theming.
+
+### Verified
+
+- Frontend `npm run build` succeeds (30 modules, 0 errors).
+- End-to-end API flow: upload → chat (answer + citations) → empty question
+  (400) → reset.
+- Citation markers `【第N页】` present in LLM answers and highlighted as badges
+  in the rendered HTML.
+- All four Task 14 requirements covered: question input, answer display,
+  citation display, loading state.
+
+### Notes
+
+- Citation marker highlighting uses a regex replacement that wraps
+  `【第N页】` in `<mark>` tags — safe after HTML-encoding the answer text.
+- The input is a `<textarea>` (not `<input>`) to allow multi-line questions.
+- Phase 4 (Frontend) is complete. Ready for Task 15 (Testing &
+  Documentation).
