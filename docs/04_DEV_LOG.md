@@ -169,3 +169,35 @@
 - Chunker is independent of parsing (Task 5) and embedding (Task 7).
 - Chinese-aware separators ensure clean breaks at sentence/paragraph boundaries.
 - Flat chunk list with page numbers is ready for embedding generation.
+
+---
+
+## Task 7 - Embedding Generation
+
+**Status:** ✅ Completed
+
+**Date:** 2026-07-13
+
+### Completed
+
+- Created `backend/models/embedding.py` — `ChunkEmbedding` model:
+  - Carries forward `chunk_index`, `page_number`, `text` from the chunk.
+  - Stores the embedding vector as `list[float]` for JSON serialisability.
+- Created `backend/services/embedder.py` — `EmbeddingService` class:
+  - Loads `BAAI/bge-small-zh-v1.5` via `sentence-transformers` once at instantiation.
+  - `embed_chunks(chunks) → list[ChunkEmbedding]` — batch-encodes all texts.
+  - Normalises embeddings (L2 norm ≈ 1.0) for cosine-similarity search in FAISS.
+  - Exposes `dim` property (512) for downstream dimension checks.
+
+### Verified
+
+- Full pipeline: parse → chunk → embed produces 1:1 chunk-to-embedding mapping.
+- All embeddings have dimension 512.
+- All embeddings are L2-normalised (norm ≈ 1.0000).
+- Metadata (`chunk_index`, `page_number`) preserved through the pipeline.
+
+### Notes
+
+- The model is downloaded from HuggingFace on first use and cached locally.
+- Embeddings are normalised so FAISS `IndexFlatIP` (inner product) can be used for cosine similarity.
+- Ready for FAISS indexing (Task 8).
