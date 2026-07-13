@@ -236,3 +236,33 @@
 - Uses `IndexFlatIP` (exact search, no approximation) — ideal for MVP with small document collections.
 - Vector store directory (`backend/data/vector_store/`) is gitignored (runtime data).
 - Ready for retrieval pipeline (Task 9).
+
+---
+
+## Task 9 - Retrieval Pipeline
+
+**Status:** ✅ Completed
+
+**Date:** 2026-07-13
+
+### Completed
+
+- Created `backend/services/retriever.py` — `RetrievalService` class:
+  - Wires `EmbeddingService` + `VectorStore` into a single `retrieve(question, top_k)` call.
+  - Returns `list[SearchResult]` ranked by cosine similarity.
+  - Returns `[]` for empty/blank questions.
+  - Reads `TOP_K` default from config.
+
+### Verified
+
+- Three semantically distinct topics (CNN, Python decorators, pH/chemistry).
+- Three natural-language queries each hit the correct page at rank 1 with clear score margins.
+- Empty string → `[]`.
+- Blank string → `[]`.
+- `top_k=2` returns exactly 2 results.
+
+### Notes
+
+- Retrieval is the bridge between the knowledge base (Phase 2) and answer generation (Phase 3).
+- The service is stateless — it depends on an already-built `VectorStore`.
+- Ready for prompt generation (Task 10).
