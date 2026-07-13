@@ -266,3 +266,35 @@
 - Retrieval is the bridge between the knowledge base (Phase 2) and answer generation (Phase 3).
 - The service is stateless — it depends on an already-built `VectorStore`.
 - Ready for prompt generation (Task 10).
+
+---
+
+## Task 10 - Prompt Generation
+
+**Status:** ✅ Completed
+
+**Date:** 2026-07-13
+
+### Completed
+
+- Created `backend/prompts/qa_template.txt` — Chinese prompt template for Qwen2.5:
+  - System role: "你是一个专业的文档助手"
+  - `{context}` placeholder for retrieved chunks.
+  - `{question}` placeholder for user input.
+  - Instructions: answer from context only, acknowledge gaps, cite page numbers.
+- Created `backend/services/prompt_builder.py` — `PromptBuilder` class:
+  - Loads template from disk on init (not hardcoded).
+  - `build(context_chunks, question) → str` — formats chunks with `[页码 N]` labels and fills the template.
+  - `_format_context()` renders each chunk as a labelled block.
+
+### Verified
+
+- Full chain: retrieve → build prompt produces well-formed output.
+- Context chunks formatted with `[页码 N]` markers.
+- All template sections present (参考文档内容, 用户问题, 回答要求).
+- Prompt contains the correct question and relevant context.
+
+### Notes
+
+- Template is stored as a file, not hardcoded — easy to iterate on prompt engineering.
+- Ready for Chat API (Task 11).
